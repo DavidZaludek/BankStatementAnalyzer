@@ -1,6 +1,6 @@
 # Bank statement analyzer
 
-This repository was created to store sources and build of my applicaion that was developed as part of my bachelors thesis.
+This repository was created to store text, sources and build of my application that was developed as part of my bachelors thesis.
 
 ## Features :
 
@@ -18,6 +18,14 @@ Download build and run index.html.
 ## Testing :
 
 In test/bankFiles you can find bank statements in supported formats for each bank. These can be used for testing of different charts and file manager.
+
+## Use case : 
+
+### New user
+- Sign up for an account 
+- Upload files
+- Select chart to display
+- Log out
 
 ## DISCLAIMER
 - Application stores user data in IndexedDB so user data is not reachable cross browser unless web server is implemented with its own database.
