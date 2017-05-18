@@ -1,10 +1,10 @@
 /**
  * Created by davidzaludek on 01/05/17.
  */
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
+/* eslint-disable */
+import React from 'react';
 
-import {FormGroup,FormControl,ControlLabel,Radio,Grid,Col,Row,Label} from "react-bootstrap";
+import {FormGroup,ControlLabel,Radio,Grid,Col,Row,Label,Button} from "react-bootstrap";
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend,ReferenceLine,ResponsiveContainer,LineChart, Line,PieChart,Pie,Cell } from 'recharts';
 import moment from "moment";
@@ -13,8 +13,6 @@ import {GranularityEnum,TransactionTypeEnum} from "../enums";
 import {Currencies} from "../enums/currencies"
 
 import {Banks} from "../Utils/banks";
-
-import DatePicker from "react-bootstrap-date-picker";
 
 import {DatePickerElement,SliderElement,CurrencySelectElement} from "../components/filterFormElements";
 
@@ -58,7 +56,6 @@ export const Graphs = {
                                                    value={this.filter.dateFrom}
                                                    onChange={(e) => {
                                                        this.handleDateChange(e, "dateFrom");
-                                                       filterChangeHandler()
                                                    }}/>
 
                                 <DatePickerElement label="To :"
@@ -66,34 +63,37 @@ export const Graphs = {
                                                    value={this.filter.dateTo}
                                                    onChange={(e) => {
                                                        this.handleDateChange(e, "dateTo");
-                                                       filterChangeHandler()
                                                    }}
                                 />
 
                                 <SliderElement
                                     label="Granularity :"
                                     name="granularity"
+                                    displayGranularity={GranularityEnum.list[this.filter.granularity].name}
                                     defaultValue={0}
                                     type="range"
                                     min={0}
                                     max={GranularityEnum.list.length - 1}
-                                    onChange=
-                                        {(e) => {
-                                            this.handleChange(e);
-                                            filterChangeHandler()
-                                        }}
-                                ></SliderElement>
-                                <CurrencySelectElement name="currency" onChange=
-                                    {(e) => {
+                                    onChange={(e) => {
                                         this.handleChange(e);
-                                        filterChangeHandler()
-                                    }} selected={this.filter.currency}>
+                                    }}
+                                ></SliderElement>
+
+                                <CurrencySelectElement name="currency" onChange={(e) => {
+                                    this.handleChange(e);
+                                }} selected={this.filter.currency}>
                                 </CurrencySelectElement>
+
+                                <Button onClick={() => {
+                                    filterChangeHandler()
+                                }}>Generate</Button>
                             </FormGroup>
                         );
                     },
 
                     filterRecords(records, filter){
+
+                        console.log("FILTERING DATA");
 
                         var tmpFilter = {};
 
@@ -142,6 +142,8 @@ export const Graphs = {
                                 break;
                             case GranularityEnum.YEAR:
                                 formatString = "YYYY";
+                                break;
+                            default:
                                 break;
                         }
 
@@ -226,7 +228,6 @@ export const Graphs = {
                     },
 
                     handleDateChange(e, name){
-                        console.log(e);
                         this.filter[name] = e;
                     },
 
@@ -243,11 +244,10 @@ export const Graphs = {
                             <FormGroup>
 
                                 <ControlLabel>Select category :</ControlLabel>
-                                <FormGroup name="category" onChange=
-                                    {(e) => {
-                                        this.handleChange(e);
-                                        filterChangeHandler()
-                                    }}>
+                                <FormGroup name="category" onChange={(e) => {
+                                    this.handleChange(e);
+                                    filterChangeHandler()
+                                }}>
                                     <Radio name="category" value={GranularityEnum.WEEK}>
                                         Days of week
                                     </Radio>
@@ -257,12 +257,14 @@ export const Graphs = {
                                     <Radio name="category" value="TRANSACTION_TYPE">
                                         Transaction types
                                     </Radio>
+                                    <Radio name="category" value="COMPANY_NAME">
+                                        Company name
+                                    </Radio>
                                 </FormGroup>
-                                <CurrencySelectElement name="currency" onChange=
-                                    {(e) => {
-                                        this.handleChange(e);
-                                        filterChangeHandler()
-                                    }} selected={this.filter.currency}>
+                                <CurrencySelectElement name="currency" onChange={(e) => {
+                                    this.handleChange(e);
+                                    filterChangeHandler()
+                                }} selected={this.filter.currency}>
                                 </CurrencySelectElement>
                             </FormGroup>
                         );
@@ -360,6 +362,34 @@ export const Graphs = {
                                     };
                                 });
                                 break;
+                            case "COMPANY_NAME":
+                                var mySet = new Set();
+
+                                records.filter((val) => {
+                                    mySet.add(val.companyName);
+                                });
+
+                                for (let item of mySet.values()) {
+                                    var amountMinus = 0;
+                                    var amountPlus = 0;
+
+                                    var tmpRecords = records.filter((record) => {
+                                        if (record.companyName === item) {
+                                            if (record.amount < 0) {
+                                                amountMinus -= fx(record.amount).from(record.currency).to(tmpFilter.currency.code);
+                                            }
+                                        }
+                                        return false;
+                                    });
+
+                                    tmpDisplayData.push({
+                                        name: item,
+                                        amountMinus: amountMinus
+                                    });
+                                }
+                                break;
+                            default:
+                                break;
                         }
 
                         return tmpDisplayData;
@@ -420,12 +450,10 @@ export const Graphs = {
                                 <DatePickerElement label="From :" name="dateFrom" value={this.filter.dateFrom}
                                                    onChange={(e) => {
                                                        this.handleDateChange(e, "dateFrom");
-                                                       filterChangeHandler()
                                                    }}/>
                                 <DatePickerElement label="To :" name="dateTo" value={this.filter.dateTo}
                                                    onChange={(e) => {
                                                        this.handleDateChange(e, "dateTo");
-                                                       filterChangeHandler()
                                                    }}/>
                                 <SliderElement
                                     label="Granularity :"
@@ -436,15 +464,16 @@ export const Graphs = {
                                     max={GranularityEnum.list.length - 1}
                                     onChange={(e) => {
                                         this.handleChange(e)
-                                        filterChangeHandler()
                                     }}>
                                 </SliderElement>
                                 <CurrencySelectElement name="currency" onChange=
                                     {(e) => {
                                         this.handleChange(e);
-                                        filterChangeHandler()
                                     }} selected={this.filter.currency}>
                                 </CurrencySelectElement>
+                                <Button onClick={() => {
+                                    filterChangeHandler()
+                                }}>Generate</Button>
                             </FormGroup>
                         );
                     },
@@ -495,7 +524,8 @@ export const Graphs = {
                                 break;
                         }
 
-                        var accountBalance = 0;
+                        var accountBalanceMinus = 0;
+                        var accountBalancePlus = 0;
 
                         var startDate = tmpFilter.from;
 
@@ -510,13 +540,16 @@ export const Graphs = {
                             while (i < tmpRecords.length && moment(tmpRecord.date).format(formatString).toString() === formattedStartDate) {
                                 tmpRecord = tmpRecords[i];
                                 if (tmpRecord.amount < 0)
-                                accountBalance -= fx(tmpRecord.amount).from(tmpRecord.currency).to(filter.currency);
+                                    accountBalanceMinus -= fx(tmpRecord.amount).from(tmpRecord.currency).to(filter.currency);
+                                else
+                                    accountBalancePlus += fx(tmpRecord.amount).from(tmpRecord.currency).to(filter.currency);
                                 i++;
                             }
 
                             tmpDisplayData.push({
                                 formattedDate: formattedStartDate,
-                                amount: accountBalance
+                                amountMinus: accountBalanceMinus,
+                                amountPlus: accountBalancePlus
                             });
 
                             startDate = startDate.add(1, 'd');
@@ -538,7 +571,8 @@ export const Graphs = {
                                     <YAxis/>
                                     <Tooltip/>
                                     <Legend />
-                                    <Line dataKey="amount" fill="#8884d8" activeDot={{r: 8}}/>
+                                    <Line dataKey="amountMinus" fill="#ff6600" activeDot={{r: 1}}/>
+                                    <Line dataKey="amountPlus" fill="#4dff4d" activeDot={{r: 2}}/>
                                 </LineChart>
                             </ResponsiveContainer>);
                     }
@@ -586,6 +620,9 @@ export const Graphs = {
                                     <Radio name="type" value="TRANSACTION_TYPE" list={TransactionTypeEnum.list}>
                                         By transaction type
                                     </Radio>
+                                    <Radio name="type" value="COMPANY_NAME">
+                                        By company name
+                                    </Radio>
                                 </FormGroup>
                             </FormGroup>
                         );
@@ -593,7 +630,7 @@ export const Graphs = {
 
                     filterRecords(records, filter){
 
-                        var tmpDisplayData;
+                        var tmpDisplayData = [];
 
                         var amountPlusSum = 0;
                         var amountMinusSum = 0;
@@ -604,7 +641,7 @@ export const Graphs = {
                                 var amountPlus = 0;
 
                                 var tmpRecords = records.filter((record) => {
-                                    if (record.bankName === val.bankEnum) {
+                                    if (record.bankName === val.enum) {
                                         if (record.amount < 0) {
                                             amountMinus -= fx(record.amount).from(record.currency).to("USD");
                                         }
@@ -646,11 +683,38 @@ export const Graphs = {
                                     color: val.color
                                 };
                             });
+                        } else if (filter.type === "COMPANY_NAME") {
+                            var mySet = new Set();
+
+                            records.filter((val) => {
+                                mySet.add(val.companyName);
+                            });
+
+                            for (let item of mySet.values()) {
+                                var amountMinus = 0;
+                                var amountPlus = 0;
+
+                                var tmpRecords = records.filter((record) => {
+                                    if (record.companyName === item) {
+                                        if (record.amount < 0) {
+                                            amountMinus -= fx(record.amount).from(record.currency).to("USD");
+                                        }
+                                    }
+                                    return false;
+                                });
+
+                                tmpDisplayData.push({
+                                    name: item,
+                                    amountMinus: amountMinus,
+                                    amountPlus: 0
+                                });
+                            }
                         }
 
                         tmpDisplayData.map((val) => {
                             amountPlusSum += val.amountPlus;
                             amountMinusSum += val.amountMinus;
+                            return false;
                         });
 
                         tmpDisplayData = tmpDisplayData.map((val) => {
@@ -695,8 +759,6 @@ export const Graphs = {
                                                     }
                                                 </Pie>
                                                 <Tooltip/>
-
-                                                <Legend />
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </Col>
@@ -713,7 +775,7 @@ export const Graphs = {
                                                     }
                                                 </Pie>
                                                 <Tooltip/>
-                                                <Legend />
+                                                <Legend/>
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </Col>

@@ -1,10 +1,11 @@
+import {default as UUID} from "node-uuid";
 
 var initialState = {
-    uid: "",
+    uid: UUID.v4(),
     name: "default",
     loggedIn: false,
     files:[]
-}
+};
 
 export default function (state = initialState, action) {
     switch (action.type) {
@@ -13,6 +14,7 @@ export default function (state = initialState, action) {
             return state;
         case 'USER_LOGOUT':
             state = initialState;
+            state.uid = UUID.v4();
             return state;
         case 'ADD_FILE':
             state.files.push(action.payload);

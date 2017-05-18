@@ -10,7 +10,7 @@ export const Banks =
         {
             id: 0,
             name: "Unknown",
-            bankEnum: "UNKNOWN",
+            enum: "UNKNOWN",
             color: "#4D4D4D",
             parse(data){
                 return [];
@@ -20,7 +20,7 @@ export const Banks =
         {
             id: 1,
             name: "Fio CZ",
-            bankEnum: "FIOCZ",
+            enum: "FIOCZ",
             color: "#5DA5DA",
             parse: (data)=>{
                 var parsedData = Papa.parse(data,
@@ -29,23 +29,30 @@ export const Banks =
 
                 var records = [];
 
-
-                console.log(parsedData.data);
-
                 for (var prop in parsedData.data) {
 
                     var tmpRecord ={};
 
                     var rawRecord = parsedData.data[prop];
 
-                    var tmpDate = moment(rawRecord[0],"DD.MM.YYYY");
+                    if (rawRecord.length !== 19)
+                        continue;
+
+                    var tmpDate = moment(rawRecord[1],"DD.MM.YYYY");
 
                     if (tmpDate.isValid()) {
-                        tmpRecord.amount = parseFloat(rawRecord[1]);
-                        tmpRecord.currency = rawRecord[2];
+                        tmpRecord.amount = parseFloat(rawRecord[2]);
+                        tmpRecord.currency = rawRecord[3];
                         tmpRecord.date = tmpDate.toString();
 
-                        switch (rawRecord[7]) {
+                        if (rawRecord[11].startsWith("Nákup: ")){
+                            var str = rawRecord[11];
+                            tmpRecord.companyName = str.substring(str.indexOf("Nákup: ")+ 7,str.indexOf(","));
+                        }else {
+                            tmpRecord.companyName = "Unknown";
+                        }
+
+                        switch (rawRecord[13]) {
                             case "Karetní transakce":
                                 if (rawRecord[5].startsWith("Výběr z bankomatu"))
                                     tmpRecord.transactionType = TransactionTypeEnum.ATM;
@@ -82,8 +89,8 @@ export const Banks =
         ,
         {
             id: 2,
-            name: "VUB SK",
-            bankEnum: "VUBSK",
+            name: "VÚB SK",
+            enum: "VUBSK",
             color: "#FAA43A",
             parse: (data)=>{
                 var parsedData = Papa.parse(data,
@@ -103,10 +110,12 @@ export const Banks =
                     var tmpDate = moment(rawRecord[0],"YYYYMMDD");
 
                     if (tmpDate.isValid()) {
+
                         tmpRecord.amount = parseFloat(rawRecord[5].replace(",","."));
                         tmpRecord.currency = rawRecord[6];
                         tmpRecord.date = tmpDate.toString();
                         tmpRecord.transactionType = TransactionTypeEnum.DEFAULT;
+                        tmpRecord.companyName = "Unknown";
 
                         if (rawRecord[2]==="")
                         {
@@ -119,7 +128,7 @@ export const Banks =
                                 tmpRecord.transactionType = TransactionTypeEnum.CARD;
                             }
                         }
-                        if (rawRecord[2]!="")
+                        if (rawRecord[2]!=="")
                         {
                             if (tmpRecord.amount > 0 )
                             {
@@ -131,7 +140,6 @@ export const Banks =
                             }
                         }
 
-                        console.log(tmpRecord);
 
                         records.push(tmpRecord);
                     }

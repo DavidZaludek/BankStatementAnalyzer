@@ -2,7 +2,6 @@
  * Created by davidzaludek on 24/03/17.
  */
 
-import {GraphTypeEnum} from "../enums/index";
 
 var initialData = {
     records:[],
@@ -24,5 +23,4 @@ export default function (state = initialData, action) {
         default:
             return state;
     }
-    return state;
 }

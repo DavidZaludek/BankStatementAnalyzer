@@ -10,7 +10,6 @@ import {bindActionCreators} from "redux";
 import {filterData} from "../actions";
 
 class GraphView extends Component {
-
     render() {
         return (
             <Grid>

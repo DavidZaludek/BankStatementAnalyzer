@@ -1,5 +1,5 @@
 import {default as UUID} from "node-uuid";
-import {GranuarityEnum,ViewEnum} from "../enums/index";
+import {ViewEnum} from "../enums/index";
 import db from "../Utils/database";
 import {hashPassword} from "../Utils";
 import CryptoJS from "crypto-js";
@@ -26,6 +26,10 @@ export function userLogin(username,password) {
                                     files: files
                                 }
                             });
+                            dispatch({
+                                type: "CHANGE_VIEW",
+                                payload: ViewEnum.FILES_VIEW
+                            });
                         }
                     )
                 }
@@ -41,34 +45,51 @@ export function userSignUp(username,password) {
 
         var passHash = hashPassword(password,saltWArray);
 
-        db.table('users').add({uid: uid,name:username,passHash:passHash,salt:saltWArray});
+        db.users.where("name").equals(username).count().then((val)=>{
+
+            console.log(val);
+
+            if (val === 0 ){
+
+                db.table('users').add({uid: uid,name:username,passHash:passHash,salt:saltWArray});
+
+                dispatch({
+                    type: "USER_LOGIN",
+                    payload: {
+                        uid: uid,
+                        name: username,
+                        loggedIn: true,
+                        files: []
+                    }
+                });
+
+                dispatch({
+                    type: "CHANGE_VIEW",
+                    payload: ViewEnum.FILES_VIEW
+                });
+            }
+        });
+    }
+}
+
+export function userLogout() {
+    return (dispatch) => {
 
         dispatch({
-            type: "USER_LOGIN",
+            type: "USER_LOGOUT",
             payload: {
-                uid: uid,
-                name: username,
-                loggedIn: true,
+                uid: "",
+                name: "default",
+                loggedIn: false,
                 files: []
             }
         });
 
         dispatch({
             type: "CHANGE_VIEW",
-            payload: ViewEnum.FILES_VIEW
+            payload: ViewEnum.MAIN_VIEW
         });
-    }
-}
 
-export function userLogout() {
-    return {
-        type: "USER_LOGOUT",
-        payload: {
-            uid: "",
-            name: "default",
-            loggedIn: false,
-            files: []
-        }
     }
 }
 
@@ -94,7 +115,7 @@ export function uploadFile(file,bank,user) {
             for (var o in tmpRecords) {
                 tmpRecords[o].fileUID = uId;
                 tmpRecords[o].uid = UUID.v4();
-                tmpRecords[o].bankName = bank.bankEnum;
+                tmpRecords[o].bankName = bank.enum;
                 tmpRecords[o].userUID = user.uid;
                 db.records.add(tmpRecords[o]);
             }
@@ -105,7 +126,7 @@ export function uploadFile(file,bank,user) {
                 name: file.name,
                 dateFrom: tmpRecords[0].date.toString(),
                 dateTo: tmpRecords[tmpRecords.length - 1].date.toString(),
-                bankName: bank.bankEnum
+                bankName: bank.enum
             };
 
             db.files.add(

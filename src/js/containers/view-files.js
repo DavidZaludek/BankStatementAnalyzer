@@ -5,7 +5,6 @@ import React, {Component} from 'react';
 
 import {bindActionCreators} from "redux";
 import {connect} from 'react-redux';
-import {moment} from "moment";
 
 import {Button,FormGroup,ControlLabel,HelpBlock,FormControl,Col,Grid,Row,Table} from "react-bootstrap";
 
@@ -38,7 +37,7 @@ class FilesView extends Component {
                                     })
                                 }
                             </FormControl>
-                            <FieldGroup id="formControlsFile" type="file" label="File" help="Example block-level help text here." inputRef={(ref) => this.fileUpload = ref}/>
+                            <FieldGroup id="formControlsFile" type="file" label="File" help="Select banks statement from your bank." inputRef={(ref) => this.fileUpload = ref}/>
                             <Button onClick={() => this.props.uploadFile(this.fileUpload.files[0],Banks[this.bankSelected.options[this.bankSelected.selectedIndex].value],this.props.user)}>Upload file</Button>
                         </FormGroup>
                     </Col>

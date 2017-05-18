@@ -31,5 +31,5 @@ export function mergeSorted(a, b, c) {
 }
 
 export function hashPassword(pass,salt) {
-    return CryptoJS.PBKDF2(pass, salt, { keySize: 512/32, iterations: 300 }).toString();
+    return CryptoJS.PBKDF2(pass, salt, { keySize: 512/32, iterations: 5000 }).toString();
 }

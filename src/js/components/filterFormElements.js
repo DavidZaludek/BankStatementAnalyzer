@@ -3,21 +3,11 @@
  */
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 
-import {FormGroup,FormControl,ControlLabel,Radio,Grid,Col,Row,Label} from "react-bootstrap";
+import {FormControl,ControlLabel} from "react-bootstrap";
 
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend,ReferenceLine,ResponsiveContainer,LineChart, Line,PieChart,Pie,Cell } from 'recharts';
-import moment from "moment";
-
-import {GranularityEnum,TransactionTypeEnum} from "../enums";
 import {Currencies} from "../enums/currencies"
-
-import {Banks} from "../Utils/banks";
-
 import DatePicker from "react-bootstrap-date-picker";
-
-import {fx} from "money";
 
 export class DatePickerElement extends Component {
     render() {
@@ -29,13 +19,14 @@ export class DatePickerElement extends Component {
                 onChange={this.props.onChange} />
         </div>);
     }
-};
+}
 
 export class SliderElement extends Component {
     render() {
         return (
             <div>
                 <ControlLabel>{this.props.label}</ControlLabel>
+                <ControlLabel>{this.props.displayGranularity}</ControlLabel>
                 <FormControl
                     name={this.props.name}
                     defaultValue={this.props.defaultValue}
@@ -46,7 +37,7 @@ export class SliderElement extends Component {
                 ></FormControl>
             </div>);
     }
-};
+}
 
 export class CurrencySelectElement extends Component {
     render() {
@@ -65,4 +56,4 @@ export class CurrencySelectElement extends Component {
             </div>
         );
     }
-};
+}

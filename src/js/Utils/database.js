@@ -9,7 +9,7 @@ var db = new Dexie("AFT_DB");
 db.version(1).stores({
     users: "&uid, name, passHash",
     files: "&uid, userUID , name, dateFrom, dateTo, bankName",
-    records: "&uid, fileUID, userUID , amount, transactionType, date, currency, bankName, optionalData"
+    records: "&uid, fileUID, userUID, amount, transactionType, date, currency, bankEnum, companyName, optionalData"
 });
 
 var User = db.users.defineClass({
@@ -43,8 +43,9 @@ var Record = db.files.defineClass({
     amount: Number,
     currency: String,
     date: String,
-    bankName: String,
+    bankEnum: String,
     transactionType: String,
+    companyName: String,
     optionalData: Object
 });
 

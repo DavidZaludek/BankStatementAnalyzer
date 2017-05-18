@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 
-import {Form,FormGroup,Col,ControlLabel,FormControl,Checkbox,Button,Well} from "react-bootstrap";
+import {Form,FormGroup,Col,ControlLabel,FormControl,Grid,Row,Button,Well,HelpBlock} from "react-bootstrap";
 
 import {changeView, userLogin} from "../actions/index";
 
@@ -23,7 +23,8 @@ const LogInForm = React.createClass({
         getInitialState() {
             return {
                 name: 'Name',
-                pass: 'Password'
+                pass: 'Password',
+                validation: "null"
             };
         },
 
@@ -37,13 +38,23 @@ const LogInForm = React.createClass({
             });
         },
 
+        handleLogin(){
+            this.props.userLogin(this.state.name, this.state.pass);
+            this.setState({
+                validation:"error"
+            });
+        },
+
+
         render() {
             return (
+                <Grid>
+                    <Row>
                 <Well>
                     <Form horizontal onChange={this.onChange}>
                         <FormGroup controlId="formHorizontalEmail">
                             <Col componentClass={ControlLabel} sm={2}>
-                                Email
+                                Name
                             </Col>
                             <Col sm={10} lg={5}>
                                 <FormControl name="name" type="name" placeholder="Name"/>
@@ -55,25 +66,21 @@ const LogInForm = React.createClass({
                                 Password
                             </Col>
                             <Col sm={10} lg={5}>
-                                <FormControl name="pass" type="pass" placeholder="Password"/>
-                            </Col>
-                        </FormGroup>
-
-                        <FormGroup>
-                            <Col smOffset={2} sm={10} lg={5}>
-                                <Checkbox>Remember me</Checkbox>
+                                <FormControl name="pass" type="password" placeholder="Password"/>
                             </Col>
                         </FormGroup>
 
                         <FormGroup>
                             <Col smOffset={2} sm={10}>
-                                <Button onClick={() => this.props.userLogin(this.state.name, this.state.pass)}>
+                                <HelpBlock>{this.state.validation === "error" ? "Wrong username or password." : ""}</HelpBlock>
+                                <Button onClick={() => this.handleLogin()}>
                                     Sign in
                                 </Button>
                             </Col>
                         </FormGroup>
                     </Form>
                 </Well>
+                    </Row></Grid>
             );
         }
     }

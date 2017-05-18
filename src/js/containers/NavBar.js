@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 
 import {bindActionCreators} from "redux";
 import {connect} from 'react-redux';
-import {Nav,NavItem,Navbar,NavDropdown,MenuItem} from 'react-bootstrap';
+import {Nav,NavItem,Navbar,NavDropdown,MenuItem,Label} from 'react-bootstrap';
 
 import {changeView,userLogout} from "../actions/index";
 
@@ -14,27 +14,28 @@ import {Graphs} from "../Utils/graphs";
 
 class NavBar extends Component {
     render() {
-        return(
+        return (
             <Navbar inverse>
                 <Navbar.Header>
                     <Navbar.Brand pullLeft>
-                        <NavItem onClick={()=>this.props.changeView(ViewEnum.MAIN_VIEW)} >Bank statement analyzer</NavItem>
+                        <NavItem onClick={() => this.props.changeView(ViewEnum.MAIN_VIEW)}>Bank statement analyzer</NavItem>
                     </Navbar.Brand>
                     <Navbar.Toggle />
                 </Navbar.Header>
                 <Navbar.Collapse>
                     <Nav>
-                        <NavItem onClick={()=>this.props.changeView(ViewEnum.FILES_VIEW)}>Files</NavItem>
-                        <NavDropdown  title="Graphs" id="basic-nav-dropdown">
-                            {Graphs.list.map((val)=>{
-                                return (<MenuItem key={val.chartEnum} onClick={()=>this.props.changeView(ViewEnum.GRAPH_VIEW,this.props.activeUser,val)}>{val.name}</MenuItem>);
+                        <NavItem onClick={() => this.props.changeView(ViewEnum.FILES_VIEW)}>Files</NavItem>
+                        <NavDropdown title="Graphs" id="basic-nav-dropdown">
+                            {Graphs.list.map((val) => {
+                                return (<MenuItem key={val.chartEnum}
+                                                  onClick={() => this.props.changeView(ViewEnum.GRAPH_VIEW, this.props.activeUser, val)}>{val.name}</MenuItem>);
                             })}
                         </NavDropdown>
                     </Nav>
                     {
                         this.props.activeUser.loggedIn ?
                             <Nav pullRight>
-                                <NavItem>{this.props.activeUser.name}</NavItem>
+                                <Navbar.Text>{this.props.activeUser.name}</Navbar.Text>
                                 <NavItem onClick={() => this.props.userLogout()}>LogOut</NavItem>
                             </Nav>
                             :
@@ -47,7 +48,11 @@ class NavBar extends Component {
                     }
 
                 </Navbar.Collapse>
+                <Label
+                    bsStyle="danger">{((this.props.activeView === ViewEnum.FILES_VIEW || this.props.activeView === ViewEnum.GRAPH_VIEW) && (!this.props.activeUser.loggedIn)) ? "Guest mode, all data will be lost !" : "" }</Label>
+
             </Navbar>
+
         );
     }
 }
