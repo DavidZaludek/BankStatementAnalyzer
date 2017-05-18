@@ -15,6 +15,10 @@ Currently supported banks are :
 
 Download build and run index.html. 
 
+## Testing :
+
+In test/bankFiles you can find bank statements in supported formats for each bank. These can be used for testing of different charts and file manager.
+
 ## DISCLAIMER
 - Application stores user data in IndexedDB so user data is not reachable cross browser unless web server is implemented with its own database.
 - Application downloads rates from Open Exchange Rates if its not awailable it uses last stored rates.
